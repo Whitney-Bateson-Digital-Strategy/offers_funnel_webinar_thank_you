@@ -99,29 +99,6 @@ section{ padding:96px 48px; }
   line-height:1.45; margin:0 0 1.1rem;
 }
 
-/* ---------------- countdown bar ---------------- */
-.bar{
-  background:var(--teal-deep) !important;
-  color:var(--cream);
-  padding:10px 48px;
-  position:sticky; top:0; z-index:50;
-}
-.bar-inner{
-  display:flex; flex-wrap:wrap; gap:.4rem 1.5rem;
-  align-items:center; justify-content:center; text-align:center;
-}
-.bar-label{
-  font-size:.78rem; font-weight:600; letter-spacing:.05em;
-  text-transform:uppercase; opacity:.82;
-}
-.clock{ display:flex; gap:.9rem; }
-.clock div{ display:flex; flex-direction:column; align-items:center; min-width:2.6rem; }
-.clock b{
-  font-family:var(--display); font-size:1.3rem; font-weight:700;
-  line-height:1; color:var(--lime); font-variant-numeric:tabular-nums;
-}
-.clock span{ font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; opacity:.7; margin-top:.2rem; }
-
 /* ---------------- hero ---------------- */
 .hero{
   background:var(--teal) !important;
@@ -149,7 +126,6 @@ section{ padding:96px 48px; }
 }
 @media (max-width:768px){
   .hero{ padding:64px 24px; }
-  .bar{ padding:10px 24px; }
   footer{ padding:28px 24px; }
 }
 
@@ -161,8 +137,9 @@ section{ padding:96px 48px; }
   max-width:44rem; margin:0 auto; padding:0;
   display:flex; flex-direction:column; gap:2.5rem;
 }
-.step-list li{ counter-increment:step; position:relative; padding-left:4.25rem; }
-.step-list li::before{
+/* ">" keeps the numbered circles on the steps only, not nested lists */
+.step-list > li{ counter-increment:step; position:relative; padding-left:4.25rem; }
+.step-list > li::before{
   content:counter(step);
   position:absolute; left:0; top:-2px;
   width:44px; height:44px; border-radius:50%;
@@ -183,6 +160,18 @@ section{ padding:96px 48px; }
   font-size:15px; color:var(--ink-soft);
   border-left:3px solid var(--pink);
   padding-left:1rem;
+}
+
+/* arrow bullets inside a step */
+.arrow-list{
+  list-style:none; padding:0;
+  margin:0 0 .7em;
+  font-size:17px;
+}
+.arrow-list li{ margin-bottom:.25em; }
+.arrow-list li::before{
+  content:"→ ";
+  color:var(--coral); font-weight:700;
 }
 
 /* ---------------- come live / the tool ---------------- */
@@ -266,19 +255,6 @@ footer a{ color:rgba(255,255,255,.5); }
 </head>
 <body>
 
-<!-- ============ COUNTDOWN BAR ============ -->
-<div class="bar">
-  <div class="shell bar-inner">
-    <span class="bar-label" id="bar-label">First session starts in</span>
-    <div class="clock" id="clock">
-      <div><b data-d>--</b><span>Days</span></div>
-      <div><b data-h>--</b><span>Hrs</span></div>
-      <div><b data-m>--</b><span>Min</span></div>
-      <div><b data-s>--</b><span>Sec</span></div>
-    </div>
-  </div>
-</div>
-
 <!-- ============ HERO ============ -->
 <header class="hero">
   <div class="shell">
@@ -314,7 +290,7 @@ footer a{ color:rgba(255,255,255,.5); }
         <p>Tap the Google or Outlook button in the email and your link gets saved right on the calendar entry. When it's time, you just click and you're in.</p>
         <p>Use a different calendar? Copy the join link from the email and paste it into your event. And hang on to that email either way, since the link lives there too.</p>
         <p>Your link only works for you, so if a friend wants to come, have them sign up on their own rather than forwarding yours.</p>
-        <p class="step-note">Need to switch sessions? Just reply to that email and let Whitney know.</p>
+        <p class="step-note">Need to switch sessions? Just reply to that email and let me know.</p>
       </li>
     </ol>
   </div>
@@ -381,67 +357,6 @@ footer a{ color:rgba(255,255,255,.5); }
 </footer>
 
 <script>
-/* ---- Session countdown ----------------------------------------------
-   Rolls forward automatically:
-     before Sept 21  -> counts down to Monday
-     during a session -> shows "live right now"
-     after Sept 21   -> counts down to Wednesday
-     after Sept 23   -> the whole bar hides itself
-   Update SESSIONS and everything else follows. -04:00 is Eastern
-   Daylight Time; if a session ever lands after early November, that
-   offset becomes -05:00. ------------------------------------------ */
-var SESSIONS = [
-  { tag:'23209526', label:"Monday's session starts in",    live:"Monday's session is live right now", start:'2026-09-21T12:00:00-04:00' },
-  { tag:'23257867', label:"Wednesday's session starts in", live:"Wednesday's session is live right now", start:'2026-09-23T13:00:00-04:00' }
-];
-var RUNS_FOR_MS = 75 * 60 * 1000;   // treat a session as live for 75 minutes
-
-var bar   = document.querySelector('.bar');
-var label = document.getElementById('bar-label');
-var clock = document.getElementById('clock');
-var elD = clock.querySelector('[data-d]'),
-    elH = clock.querySelector('[data-h]'),
-    elM = clock.querySelector('[data-m]'),
-    elS = clock.querySelector('[data-s]');
-
-SESSIONS.forEach(function(s){ s.startMs = new Date(s.start).getTime(); });
-
-function pad(n){ return n < 10 ? '0' + n : '' + n; }
-
-function currentSession(now){
-  for (var i = 0; i < SESSIONS.length; i++){
-    if (now < SESSIONS[i].startMs + RUNS_FOR_MS) return SESSIONS[i];
-  }
-  return null;
-}
-
-function tick(){
-  var now = Date.now();
-  var s = currentSession(now);
-
-  if (!s){                       // every session has finished
-    if (bar) bar.style.display = 'none';
-    return;
-  }
-
-  if (now >= s.startMs){         // in progress
-    label.textContent = s.live;
-    clock.style.display = 'none';
-    return;
-  }
-
-  clock.style.display = '';
-  label.textContent = s.label;
-
-  var secs = Math.floor((s.startMs - now) / 1000);
-  elD.textContent = pad(Math.floor(secs / 86400));
-  elH.textContent = pad(Math.floor(secs % 86400 / 3600));
-  elM.textContent = pad(Math.floor(secs % 3600 / 60));
-  elS.textContent = pad(secs % 60);
-}
-tick();
-setInterval(tick, 1000);
-
 document.getElementById('yr').textContent = new Date().getFullYear();
 
 /* ---- Respect reduced-motion: show a still frame instead of the loop ---- */
