@@ -249,7 +249,7 @@ footer a{ color:rgba(255,255,255,.5); }
     <!-- Animated on load. Swapped for a still frame when the visitor
          has reduced motion turned on (see the script at the bottom). -->
     <figure class="wave">
-      <img id="wave-img" src="../whitney-wave.gif" alt="Whitney waving hello"
+      <img id="wave-img" src="whitney-wave.gif" alt="Whitney waving hello"
            width="400" height="225" fetchpriority="high">
     </figure>
 
@@ -291,7 +291,7 @@ footer a{ color:rgba(255,255,255,.5); }
     </div>
 
     <div class="live-shot">
-      <img src="../email-topic-bank.png"
+      <img src="email-topic-bank.png"
            alt="The Email Topic Bank shown on desktop, tablet and phone"
            width="1455" height="939" loading="lazy">
     </div>
@@ -322,7 +322,7 @@ footer a{ color:rgba(255,255,255,.5); }
 <section class="host">
   <div class="shell host-inner">
     <div class="host-photo">
-      <img src="../whitney.jpg" alt="Whitney Bateson" width="1200" height="1500" loading="lazy">
+      <img src="whitney.jpg" alt="Whitney Bateson" width="1200" height="1500" loading="lazy">
     </div>
     <div>
       <p>Thanks for signing up. I've been building websites, funnels, and email systems for practitioners since 2018, and this is the same system I run in my own business today. Bring your questions, I'll have time for them at the end.</p>
@@ -345,7 +345,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
 /* ---- Respect reduced-motion: show a still frame instead of the loop ---- */
 if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   var wave = document.getElementById('wave-img');
-  if (wave) wave.src = '../whitney-wave-still.jpg';
+  if (wave) wave.src = 'whitney-wave-still.jpg';
 }
 </script>
 
