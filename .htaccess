@@ -3,3 +3,10 @@
   Header set Cache-Control "no-store, no-cache, must-revalidate"
   Header set X-Cache-Enabled "false"
 </IfModule>
+
+# The ads page moved from /ads/ to /paid/. Keep old links working;
+# the query string (UTMs, fbclid) carries over automatically.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^ads/?$ /funnel-webinar-thank-you/paid/ [R=301,L]
+</IfModule>
